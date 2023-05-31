@@ -77,21 +77,28 @@ def register():
 
 @app.route("/getDoc", methods=['GET'])
 def get_doc():
-    data=request.get_json()
-    token=request.headers['Authorization']
-    if verify_token(token) is True:
-        document = Document()
-        document.add_paragraph(data['data'])
-        doc_name=str(get_id(token))+"_"+str(round(time.time() * 1000))+".docx"
-        document.save(os.path.join(app.config['RESULT_FOLDER'],doc_name))
-        return send_file(os.path.join(app.config['RESULT_FOLDER'],doc_name),download_name=doc_name,as_attachment=True)
-    else:
-        return "Invalid User!"
+    data=request.args.get("data")
+    data=json.loads(data)
+    document = Document()
+    for attribute,value in data.items():
+        document.add_paragraph(value)
+    # doc_name=str(get_id(token))+"_"+str(round(time.time() * 1000))+".docx"
+    doc_name=str(round(time.time() * 1000))+".docx"
+    document.save(os.path.join(app.config['RESULT_FOLDER'],doc_name))
+    return send_file(os.path.join(app.config['RESULT_FOLDER'],doc_name),download_name=doc_name,as_attachment=True)
+    # else:
+    #     return "Invalid User!"
 
 @app.route("/chat", methods=['GET'])
 def chat():
-    connectGpt("test")
-    return "1"
+    prompt=request.args.get("prompt")
+    result=connectGpt(prompt)
+    if result!='0':
+        return result
+    else:
+        return "Failed"
+
+    
 
 # @app.route("/showImage")
 # def showImage():
