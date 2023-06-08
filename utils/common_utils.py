@@ -36,17 +36,36 @@ def get_id(token):
     except Exception as e:
         return 0
 
-def connectGpt(prompt):
+    #     - Begin with a title page.
+    # -Create a table of contents.
+    # -Explain your “why” with an executive summary.
+    # -State the problem or need.
+    # -Propose a solution.
+    # -Share your qualifications.
+    # -Include pricing options.
+    # -Summarize with a conclusion.
+    # -Clarify your terms and conditions.
+
+def connectGpt(prompt,template):
+    message=[]
+    if template!="NA":
+        systemContent="""You are an assitant that helps to create business proposals.
+        Use the below format for the proposals
+        {temp}
+        """.format(temp=template)
+        print(systemContent)
+        message.append({"role":"system","content":systemContent})
+    message.append({"role": "user", "content": prompt})
+    print(message)
     try:
         completion = openai.ChatCompletion.create(
         engine="bigaidea",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+        messages=message
         )
-        # print(completion.choices)
+        print(completion.choices)
         return completion.choices[0].message
     except Exception as e:
+        print(e)
         return "0"
 
 
